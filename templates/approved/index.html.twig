@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Approved index{% endblock %}
+
+{% block body %}
+    <h1>Approved index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>DateApprovedTl</th>
+                <th>DateApprovedPm</th>
+                <th>StatusTeamLeader</th>
+                <th>StatusProjectManager</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for approved in approveds %}
+            <tr>
+                <td>{{ approved.id }}</td>
+                <td>{{ approved.dateApprovedTl ? approved.dateApprovedTl|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ approved.dateApprovedPm ? approved.dateApprovedPm|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ approved.statusTeamLeader }}</td>
+                <td>{{ approved.statusProjectManager }}</td>
+                <td>
+                    <a href="{{ path('app_approved_show', {'id': approved.id}) }}">show</a>
+                    <a href="{{ path('app_approved_edit', {'id': approved.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_approved_new') }}">Create new</a>
+{% endblock %}

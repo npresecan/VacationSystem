@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Approved{% endblock %}
+
+{% block body %}
+    <h1>Approved</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ approved.id }}</td>
+            </tr>
+            <tr>
+                <th>DateApprovedTl</th>
+                <td>{{ approved.dateApprovedTl ? approved.dateApprovedTl|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>DateApprovedPm</th>
+                <td>{{ approved.dateApprovedPm ? approved.dateApprovedPm|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>StatusTeamLeader</th>
+                <td>{{ approved.statusTeamLeader }}</td>
+            </tr>
+            <tr>
+                <th>StatusProjectManager</th>
+                <td>{{ approved.statusProjectManager }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_approved_index') }}">back to list</a>
+
+    <a href="{{ path('app_approved_edit', {'id': approved.id}) }}">edit</a>
+
+    {{ include('approved/_delete_form.html.twig') }}
+{% endblock %}
