@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block body %}
+    <nav>
+        <ul>
+            <li><a href="{{ path('admin_dashboard') }}">Home</a></li>
+            <li><a href="{{ path('admin_employees') }}">Employees</a></li>
+            <li><a href="">Teams</a></li>
+        </ul>
+        <form action="{{ path('logout') }}" method="POST" style="display: inline;">
+            <button type="submit">Logout</button>
+        </form>
+    </nav>
+
+    <h1>Welcome {{ username }}</h1>
+    <p><strong>Role:</strong>
+        {% for role in roles %}
+            {{ role }}
+        {% endfor %}
+    </p>
+{% endblock %}

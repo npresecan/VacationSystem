@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {% if 'ROLE_TEAM LEADER' in roles %}
+        Team Leader Dashboard
+    {% elseif 'ROLE_PROJECT MANAGER' in roles %}
+        Project Manager Dashboard
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <h1> 
+        {% if 'ROLE_TEAM LEADER' in roles %}
+            Team Leader Dashboard
+        {% elseif 'ROLE_PROJECT MANAGER' in roles %}
+            Project Manager Dashboard
+        {% endif %}
+    </h1>
+
+    <p><strong>Username:</strong> {{ username }}</p>
+    <p><strong>Roles:</strong>
+        {% for role in roles %}
+            {{ role }}
+        {% endfor %}
+    </p>
+
+    <form action="{{ path('logout') }}" method="POST">
+        <button type="submit" class="btn btn-danger">Log out</button>
+    </form>
+{% endblock %}

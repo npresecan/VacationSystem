@@ -5,9 +5,11 @@ namespace App\Entity;
 use App\Repository\EmployeeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
-class Employee
+class Employee implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -170,5 +172,25 @@ class Employee
         $this->job = $job;
 
         return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
+    public function getRoles(): array
+    {
+        $roles = [];
+        if ($this->role) {
+            $roles[] = 'ROLE_' . strtoupper($this->role->getName());
+        }
+
+        return array_unique($roles);
+    }
+
+    public function eraseCredentials(): void
+    {
+        
     }
 }

@@ -10,6 +10,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
 class EmployeeType extends AbstractType
 {
@@ -24,7 +25,7 @@ class EmployeeType extends AbstractType
             ->add('vacationDays')
             ->add('email')
             ->add('username')
-            ->add('password')
+            ->add('password', PasswordType::class)
             ->add('role', EntityType::class, [
                 'class' => Role::class,
                 'choice_label' => 'id',

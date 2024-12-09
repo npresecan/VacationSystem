@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Employees{% endblock %}
+
+{% block body %}
+    <nav>
+        <ul>
+            <li><a href="{{ path('admin_dashboard') }}">Home</a></li>
+            <li><a href="{{ path('admin_employees') }}">Employees</a></li>
+            <li><a href="">Teams</a></li>
+        </ul>
+        <form action="{{ path('logout') }}" method="POST" style="display: inline;">
+            <button type="submit">Logout</button>
+        </form>
+    </nav>
+
+    <h1>Employees</h1>
+    <form action="" method="GET" style="display: inline;">
+        <button type="submit">Add new employee</button>
+    </form>
+
+    <br></br>
+
+    <table style="text-align: center;">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Birth Date</th>
+                <th>Role</th>
+                <th>Team</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees %}
+                {% if 'Admin' not in employee.role.name %}
+                    <tr>
+                        <td>{{ employee.firstName }}</td>
+                        <td>{{ employee.lastName }}</td>
+                        <td>{{ employee.birthDate|date('Y-m-d') }}</td>
+                        <td>{{ employee.role.name }}</td>
+                        <td>{{ employee.team.name }}</td>
+                        <td>
+                            <form action="" method="GET" style="display: inline;">
+                                <button type="submit">Edit</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form action="" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this employee?');">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% else %}
+                <tr>
+                    <td>No employees found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

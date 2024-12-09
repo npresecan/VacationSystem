@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[Route('/employee')]
 final class EmployeeController extends AbstractController
@@ -23,13 +24,17 @@ final class EmployeeController extends AbstractController
     }
 
     #[Route('/new', name: 'app_employee_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
         $employee = new Employee();
         $form = $this->createForm(EmployeeType::class, $employee);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $plainPassword = $form->get('password')->getData();
+            $hashedPassword = $passwordHasher->hashPassword($employee, $plainPassword);
+            $employee->setPassword($hashedPassword);
+            
             $entityManager->persist($employee);
             $entityManager->flush();
 
