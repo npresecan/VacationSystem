@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Employee;
 use App\Form\EmployeeType;
+use App\Form\EmployeeEditType;
 use App\Repository\EmployeeRepository;
+use App\Repository\RoleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,9 +26,16 @@ final class EmployeeController extends AbstractController
     }
 
     #[Route('/new', name: 'app_employee_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, RoleRepository $roleRepository): Response
     {
         $employee = new Employee();
+        $role = $roleRepository->find(2); 
+        if ($role) {
+            $employee->setRole($role);
+        }
+
+        $employee->setVacationDays(20);
+
         $form = $this->createForm(EmployeeType::class, $employee);
         $form->handleRequest($request);
 
@@ -34,16 +43,16 @@ final class EmployeeController extends AbstractController
             $plainPassword = $form->get('password')->getData();
             $hashedPassword = $passwordHasher->hashPassword($employee, $plainPassword);
             $employee->setPassword($hashedPassword);
-            
+
             $entityManager->persist($employee);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_employee_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('admin_employees', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('employee/new.html.twig', [
             'employee' => $employee,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -58,13 +67,13 @@ final class EmployeeController extends AbstractController
     #[Route('/{id}/edit', name: 'app_employee_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Employee $employee, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(EmployeeType::class, $employee);
+        $form = $this->createForm(EmployeeEditType::class, $employee);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_employee_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('admin_employees', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('employee/edit.html.twig', [
@@ -81,6 +90,6 @@ final class EmployeeController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_employee_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('admin_employees', [], Response::HTTP_SEE_OTHER);
     }
 }
