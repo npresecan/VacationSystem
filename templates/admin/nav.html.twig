@@ -1,0 +1,11 @@
+
+<nav>
+    <ul>
+        <li><a href="{{ path('admin_dashboard') }}">Home</a></li>
+        <li><a href="{{ path('admin_employees') }}">Employees</a></li>
+        <li><a href="{{ path('admin_teams') }}">Teams</a></li>
+    </ul>
+    <form action="{{ path('logout') }}" method="POST" style="display: inline;">
+        <button type="submit">Logout</button>
+    </form>
+</nav>

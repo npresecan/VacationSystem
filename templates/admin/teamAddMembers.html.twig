@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add Members to {{ team.name }}{% endblock %}
+
+{% block body %}
+    <h1>Add Members to Team: {{ team.name }}</h1>
+
+    <form method="POST">
+        <h2>Team Leader</h2>
+        <select name="team_leader" {% if teamLeader %} disabled {% endif %}>
+            <option value="">-- Select Team Leader --</option>
+            {% if teamLeader %}
+                <option value="{{ teamLeader.id }}" selected disabled>
+                    {{ teamLeader.firstName }} {{ teamLeader.lastName }} - {{ teamLeader.job.name }}
+                </option>
+            {% else %}
+                {% for employee in employees %}
+                    <option value="{{ employee.id }}">
+                        {{ employee.firstName }} {{ employee.lastName }} - {{ employee.job.name }}
+                    </option>
+                {% endfor %}
+            {% endif %}
+        </select>
+        
+        <h2>Project Manager</h2>
+        <select name="project_manager" {% if projectManager %} disabled {% endif %}>
+            <option value="">-- Select Project Manager --</option>
+            {% if projectManager %}
+                <option value="{{ projectManager.id }}" selected disabled>
+                    {{ projectManager.firstName }} {{ projectManager.lastName }} - {{ projectManager.job.name }}
+                </option>
+            {% else %}
+                {% for employee in employees %}
+                    <option value="{{ employee.id }}">
+                        {{ employee.firstName }} {{ employee.lastName }} - {{ employee.job.name }}
+                    </option>
+                {% endfor %}
+            {% endif %}
+        </select>
+
+        <h2>Employees</h2>
+        <ul>
+            {% for employee in employees %}
+                <li>
+                    <input type="checkbox" name="members[]" value="{{ employee.id }}">
+                    {{ employee.firstName }} {{ employee.lastName }} - {{ employee.job.name }}
+                </li>
+            {% endfor %}
+        </ul>
+
+        <button type="submit">Add to Team</button>
+    </form>
+
+    <a href="{{ path('app_team_show', {'id': team.id}) }}">Back to Team</a>
+{% endblock %}

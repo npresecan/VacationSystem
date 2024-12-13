@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Team Details{% endblock %}
+
+{% block body %}
+
+    <h1>Team: {{ teams.name }}</h1>
+
+    <div>
+        <h2>Members</h2>
+        <div>
+            {% if employees is not empty %}
+                <ul>
+                    {% for employee in employees %}
+                        <li>
+                            <strong>Name:</strong> {{ employee.firstName }} {{ employee.lastName }} <br>
+                            <strong>Role:</strong> {{ employee.role.name }} <br>
+                            <strong>Job:</strong> {{ employee.job.name }}
+                        </li>
+                        <hr>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No members in this team.</p>
+            {% endif %}
+        </div>
+        <form action="{{ path('app_team_add_members', {'id': teams.id}) }}" method="GET" style="display: inline;">
+            <button type="submit">Edit members</button>
+        </form>
+    </div>
+
+    <a href="{{ path('app_team_index') }}">Back to Teams</a>
+{% endblock %}

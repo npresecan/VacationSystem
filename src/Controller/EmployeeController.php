@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-#[Route('/employee')]
+#[Route('/admin/employees')]
 final class EmployeeController extends AbstractController
 {
     #[Route(name: 'app_employee_index', methods: ['GET'])]

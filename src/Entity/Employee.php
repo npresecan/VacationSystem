@@ -41,7 +41,7 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $password = null;
 
-    #[ORM\ManyToOne(targetEntity: Team::class)]
+    #[ORM\ManyToOne(targetEntity: Team::class, inversedBy:'employees')]
     #[ORM\JoinColumn(name: 'team_id', referencedColumnName: 'id', nullable: true)]
     private ?Team $team = null;
 

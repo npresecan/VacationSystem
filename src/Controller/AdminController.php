@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Employee;
+use App\Entity\Team;
 use Doctrine\ORM\EntityManagerInterface;
 
 class AdminController extends AbstractController
@@ -31,6 +32,15 @@ class AdminController extends AbstractController
         $employees = $entityManager->getRepository(Employee::class)->findAll();
         return $this->render('admin/employees.html.twig', [
             'employees' => $employees,
+        ]);
+    }
+
+    #[Route('/admin/teams', name: 'admin_teams', methods: ['GET'])]
+    public function teams(EntityManagerInterface $entityManager): Response
+    {
+        $teams = $entityManager->getRepository(Team::class)->findAll();
+        return $this->render('admin/teams.html.twig', [
+            'teams' => $teams,
         ]);
     }
 }

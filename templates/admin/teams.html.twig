@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Employees{% endblock %}
+
+{% block body %}
+    {% include 'admin/nav.html.twig' %}
+
+    <h1>Teams</h1>
+    
+    <form action="{{ path('app_team_new') }}" method="GET" style="display: inline;">
+        <button type="submit">Add new team</button>
+    </form>
+
+    <br></br>
+
+    <div>
+        {% for team in teams %}
+            <div>
+                <h2>{{ team.name }}</h2>
+                <a href="{{ path('app_team_show', { id: team.id }) }}">View Members</a>
+            </div>
+        {% else %}
+            <p>No teams available.</p>
+        {% endfor %}
+    </div>
+
+{% endblock %}
