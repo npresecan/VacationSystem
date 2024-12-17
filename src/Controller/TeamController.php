@@ -56,81 +56,43 @@ final class TeamController extends AbstractController
     }
 
     #[Route('/team/{id}/add-members', name: 'app_team_add_members', methods: ['GET', 'POST'])]
-    public function addMembers(Team $team, Request $request, EntityManagerInterface $entityManager): Response
+    public function addMembers(Team $team, Request $request, TeamRepository $teamRepository, EntityManagerInterface $em): Response
     {
-        $employees = $entityManager->getRepository(Employee::class)->findBy([
-            'team' => null,
-            'role' => $entityManager->getRepository(Role::class)->findOneBy(['name' => 'Employee'])
-        ]);
-        
-        $teamLeader = $entityManager->getRepository(Employee::class)->findOneBy([
-            'team' => $team,
-            'role' => $entityManager->getRepository(Role::class)->findOneBy(['name' => 'Team Leader'])
-        ]);
-
-        $projectManager = $entityManager->getRepository(Employee::class)->findOneBy([
-            'team' => $team,
-            'role' => $entityManager->getRepository(Role::class)->findOneBy(['name' => 'Project Manager'])
-        ]);
+        $employees = $teamRepository->getUnassignedEmployees();
+        $teamLeader = $teamRepository->getTeamLeader($team);
+        $projectManager = $teamRepository->getProjectManager($team);
 
         if ($request->isMethod('POST')) {
             if ($request->request->get('team_leader')) {
-                $newTeamLeader = $entityManager->getRepository(Employee::class)->find($request->request->get('team_leader'));
+                $newTeamLeader = $em->getRepository(Employee::class)->find($request->request->get('team_leader'));
                 if ($newTeamLeader) {
-                    $newTeamLeader->setRole($entityManager->getRepository(Role::class)->findOneBy(['name' => 'Team Leader']));
-                    $newTeamLeader->setTeam($team);
-                    $entityManager->persist($newTeamLeader);
+                    $teamRepository->updateTeamLeader($newTeamLeader, $team);
+                    $em->flush();
                 }
             }
             
             if ($request->request->get('project_manager')) {
-                $newProjectManager = $entityManager->getRepository(Employee::class)->find($request->request->get('project_manager'));
+                $newProjectManager = $em->getRepository(Employee::class)->find($request->request->get('project_manager'));
                 if ($newProjectManager) {
-                    $newProjectManager->setRole($entityManager->getRepository(Role::class)->findOneBy(['name' => 'Project Manager']));
-                    $newProjectManager->setTeam($team);
-                    $entityManager->persist($newProjectManager);
+                    $teamRepository->updateProjectManager($newProjectManager, $team);
+                    $em->flush();
                 }
             }
             
-            $members = $request->request->get('members');
-            if ($members && is_array($members)) { 
-                foreach ($members as $memberId) {
-                    $member = $entityManager->getRepository(Employee::class)->find($memberId);
-                    if ($member) {
-                        $member->setTeam($team);
-                        $entityManager->persist($member);
-                    }
-                }
-            }
-            
-            $entityManager->flush();
+            $members = $request->request->all()['members'];
 
+            if (is_array($members)) {
+                $teamRepository->addTeamMembers($members, $team);
+            }
+    
             return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
         }
-
+    
         return $this->render('admin/teamAddMembers.html.twig', [
             'team' => $team,
             'employees' => $employees,
             'teamLeader' => $teamLeader,
-            'projectManager' => $projectManager
-        ]);
-    }
-
-    #[Route('/{id}/edit', name: 'app_team_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Team $team, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(TeamType::class, $team);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_team_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('team/edit.html.twig', [
-            'team' => $team,
-            'form' => $form,
+            'projectManager' => $projectManager,
         ]);
     }
 

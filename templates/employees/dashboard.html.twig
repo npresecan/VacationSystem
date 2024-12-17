@@ -3,9 +3,7 @@
 {% block title %}Employee Dashboard{% endblock %}
 
 {% block body %}
-    <h1>Employee Dashboard</h1>
-
-    <p><strong>Username:</strong> {{ username }}</p>
+    <h1>Welcome {{ username }}</h1>
     <p><strong>Roles:</strong>
         {% for role in roles %}
             {{ role }}
@@ -13,6 +11,53 @@
     </p>
 
     <form action="{{ path('logout') }}" method="POST">
-        <button type="submit" class="btn btn-danger">Log out</button>
+        <button type="submit" class="btn btn-danger">Logout</button>
     </form>
+
+    <h4>Remaining days for vacation: {{ remainingVacationDays }}/{{vacdays}}</h4>
+
+    {% if team %}
+        <h2>Team: {{ team.name }}</h2>
+        <ul>
+            {% for member in teamMembers %}
+                <li>{{ member.role.name }}: {{ member.firstName }} {{ member.lastName }} - {{ member.job.name }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No team</p>
+    {% endif %}
+
+    <form action="{{ path('app_request_new') }}" method="GET" style="display: inline;">
+        <button type="submit">New request</button>
+    </form>
+
+    <h2>My requests</h2>
+    {% if requests|length > 0 %}
+        <table class="table" style="text-align: center;">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Start date</th>
+                    <th>End date</th>
+                    <th>Days</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in requests %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ request.startDate|date('Y-m-d') }}</td>
+                        <td>{{ request.endDate|date('Y-m-d') }}</td>
+                        <td>
+                            {{ request.numberOfDays}}
+                        </td>
+                        <td>{{ request.status }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No requests</p>
+    {% endif %}
 {% endblock %}

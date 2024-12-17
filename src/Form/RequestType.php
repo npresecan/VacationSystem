@@ -14,22 +14,13 @@ class RequestType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('numberOfDays')
             ->add('startDate', null, [
                 'widget' => 'single_text',
             ])
             ->add('endDate', null, [
                 'widget' => 'single_text',
             ])
-            ->add('status')
             ->add('comment')
-            ->add('createdDate', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('employee', EntityType::class, [
-                'class' => Employee::class,
-                'choice_label' => 'id',
-            ])
         ;
     }
 

@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
-use App\Entity\Request as VacationRequest; // Koristimo alias za entitet kako bismo izbjegli konflikt
+use App\Entity\Request; 
 use App\Form\RequestType;
 use App\Repository\RequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request as HttpRequest; // Alias za Symfony Request
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/request')]
+#[Route('/employees')]
 final class RequestController extends AbstractController
 {
     #[Route(name: 'app_request_index', methods: ['GET'])]
@@ -25,15 +25,47 @@ final class RequestController extends AbstractController
     #[Route('/new', name: 'app_request_new', methods: ['GET', 'POST'])]
     public function new(HttpRequest $httpRequest, EntityManagerInterface $entityManager): Response
     {
-        $request = new VacationRequest(); // Ispravno instanciranje entiteta
+        $employee = $this->getUser();
+
+        if (!$employee) {
+            throw $this->createAccessDeniedException('No access.');
+        }
+
+        $request = new Request(); 
         $form = $this->createForm(RequestType::class, $request);
         $form->handleRequest($httpRequest);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($request);
-            $entityManager->flush();
+            $startDate = $request->getStartDate();
+            $endDate = $request->getEndDate();
 
-            return $this->redirectToRoute('app_request_index', [], Response::HTTP_SEE_OTHER);
+            if (!$startDate || !$endDate) {
+                $this->addFlash('error', 'Start and end dates are required.');
+                return $this->redirectToRoute('app_request_new');
+            }
+
+            $numberOfDays = $endDate->diff($startDate)->days + 1;
+
+            if ($numberOfDays <= 0) {
+                $this->addFlash('error', 'Invalid date range.');
+                return $this->redirectToRoute('app_request_new');
+            }
+
+            if ($numberOfDays > $employee->getVacationDays()) {
+                $this->addFlash('error', 'You do not have enough vacation days remaining.');
+                return $this->redirectToRoute('app_request_new');
+            }
+
+            $request->setNumberOfDays($numberOfDays);
+            $request->setEmployee($employee);
+            $request->setStatus('CREATED');
+            $request->setCreatedDate(new \DateTime());
+
+            $entityManager->persist($request); 
+            $entityManager->flush();
+            
+            $this->addFlash('success', 'Your vacation request has been submitted successfully.');
+            return $this->redirectToRoute('employees_dashboard', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('request/new.html.twig', [

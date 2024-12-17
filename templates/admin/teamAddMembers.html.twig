@@ -37,17 +37,16 @@
                 {% endfor %}
             {% endif %}
         </select>
-
+        
         <h2>Employees</h2>
-        <ul>
+        <select name="members[]" multiple>
             {% for employee in employees %}
-                <li>
-                    <input type="checkbox" name="members[]" value="{{ employee.id }}">
-                    {{ employee.firstName }} {{ employee.lastName }} - {{ employee.job.name }}
-                </li>
+                <option value="{{ employee.id }}">{{ employee.firstName }} {{ employee.lastName }} - {{ employee.job.name }}</option>
             {% endfor %}
-        </ul>
+        </select>
 
+        <br></br>
+        
         <button type="submit">Add to Team</button>
     </form>
 
