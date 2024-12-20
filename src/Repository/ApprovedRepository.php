@@ -3,8 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\Approved;
+use App\Entity\Request;
+use App\Entity\Employee;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Service\MailerService;
 
 /**
  * @extends ServiceEntityRepository<Approved>
@@ -15,29 +18,52 @@ class ApprovedRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Approved::class);
     }
+    
+    public function processApproval(Request $request, Employee $employee, string $status, \DateTimeInterface $date, MailerService $mailerService): void
+    {
+        $approved = $this->getEntityManager()->getRepository(Approved::class)->findOneBy(['request' => $request]);
+        if (!$approved) {
+            $approved = new Approved();
+            $approved->setRequest($request); 
+            $this->getEntityManager()->persist($approved);
+            $this->getEntityManager()->flush();
+        }
+        
+        if (in_array('ROLE_TEAM LEADER', $employee->getRoles())) {
+            $approved->setTeamLeader($employee);  
+            $approved->setStatusTeamLeader($status);
+            $approved->setDateApprovedTl($date);
+        }
+        
+        if (in_array('ROLE_PROJECT MANAGER', $employee->getRoles())) {
+            $approved->setProjectManager($employee);
+            $approved->setStatusProjectManager($status);
+            $approved->setDateApprovedPm($date);
+        }
+        
+        if ($approved->getStatusTeamLeader() === 'APPROVED' && $approved->getStatusProjectManager() === 'APPROVED') {
+            $this->approveVacationRequest($request);
+            $mailerService->sendVacationApprovalEmail($request);
+        } elseif ($approved->getStatusTeamLeader() === 'DECLINED' || $approved->getStatusProjectManager() === 'DECLINED') {
+            $this->declineVacationRequest($request);
+            $mailerService->sendVacationDeclineEmail($request);
+        }
 
-    //    /**
-    //     * @return Approved[] Returns an array of Approved objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+        $this->getEntityManager()->flush();
+    }
 
-    //    public function findOneBySomeField($value): ?Approved
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    private function approveVacationRequest(Request $request): void
+    {
+        $employee = $request->getEmployee();
+        $employee->setVacationDays($employee->getVacationDays() - $request->getNumberOfDays());
+        $this->getEntityManager()->persist($employee);
+        $request->setStatus('APPROVED');
+        $this->getEntityManager()->persist($request);
+    }
+
+    private function declineVacationRequest(Request $request): void
+    {
+        $request->setStatus('DECLINED');
+        $this->getEntityManager()->persist($request);
+    }
 }

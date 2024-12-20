@@ -18,23 +18,23 @@ class Approved
     private ?Request $request = null;
 
     #[ORM\ManyToOne(targetEntity: Employee::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Employee $teamLeader = null;
 
     #[ORM\ManyToOne(targetEntity: Employee::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Employee $projectManager = null;
 
-    #[ORM\Column(type: "datetime")]
+    #[ORM\Column(type: "datetime", nullable: true)]
     private ?\DateTimeInterface $dateApprovedTl = null;
 
-    #[ORM\Column(type: "datetime")]
+    #[ORM\Column(type: "datetime", nullable: true)]
     private ?\DateTimeInterface $dateApprovedPm = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, nullable: true)]
     private ?string $statusTeamLeader = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, nullable: true)]
     private ?string $statusProjectManager = null;
 
     public function getId(): ?int

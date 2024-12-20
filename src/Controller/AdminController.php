@@ -8,11 +8,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Employee;
 use App\Entity\Team;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\RequestRepository;
 
 class AdminController extends AbstractController
 {
     #[Route('/admin/dashboard', name: 'admin_dashboard', methods: ['GET'])]
-    public function dashboard(): Response
+    public function dashboard(RequestRepository $requestRepository): Response
     {
         $user = $this->getUser();
 
@@ -20,9 +21,12 @@ class AdminController extends AbstractController
             throw $this->createAccessDeniedException('No access.');
         }
 
+        $approvedRequests = $requestRepository->findRequestsApproved('APPROVED');
+
         return $this->render('admin/dashboard.html.twig', [
             'username' => $user->getUsername(),
             'roles' => $user->getRoles(),
+            'approvedRequests' => $approvedRequests,
         ]);
     }
 
@@ -31,7 +35,7 @@ class AdminController extends AbstractController
     {
         $employees = $entityManager->getRepository(Employee::class)->findAll();
         return $this->render('admin/employees.html.twig', [
-            'employees' => $employees,
+            'employees' => $employees,ž
         ]);
     }
 

@@ -35,32 +35,20 @@ final class RequestController extends AbstractController
         $form = $this->createForm(RequestType::class, $request);
         $form->handleRequest($httpRequest);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $startDate = $request->getStartDate();
-            $endDate = $request->getEndDate();
-
-            if (!$startDate || !$endDate) {
-                $this->addFlash('error', 'Start and end dates are required.');
-                return $this->redirectToRoute('app_request_new');
+        if ($form->isSubmitted()) {
+            if (!$form->isValid()) {
+                $this->addFlash('error', 'Form submission failed.');
+                return $this->render('request/new.html.twig', [
+                    'form' => $form->createView(),
+                ]);
             }
 
-            $numberOfDays = $endDate->diff($startDate)->days + 1;
-
-            if ($numberOfDays <= 0) {
-                $this->addFlash('error', 'Invalid date range.');
-                return $this->redirectToRoute('app_request_new');
-            }
-
-            if ($numberOfDays > $employee->getVacationDays()) {
-                $this->addFlash('error', 'You do not have enough vacation days remaining.');
-                return $this->redirectToRoute('app_request_new');
-            }
-
-            $request->setNumberOfDays($numberOfDays);
+            
             $request->setEmployee($employee);
             $request->setStatus('CREATED');
             $request->setCreatedDate(new \DateTime());
 
+            
             $entityManager->persist($request); 
             $entityManager->flush();
             

@@ -19,6 +19,21 @@ class RequestRepository extends ServiceEntityRepository
     
     public function findAllRequestsForEmployee(Employee $employee): array
     {
-        return $this->findBy(['employee' => $employee], ['startDate' => 'DESC']);
+        return $this->findBy(['employee' => $employee], ['createdDate' => 'DESC']);
+    }
+
+    public function findRequestsByEmployees(array $employees, string $status): array
+    {
+        return $this->findBy([
+            'employee' => $employees,
+            'status' => $status
+        ]);
+    }
+
+    public function findRequestsApproved(string $status): array
+    {
+        return $this->findBy([
+            'status' => $status
+        ]);
     }
 }

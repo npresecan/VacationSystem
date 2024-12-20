@@ -1,0 +1,29 @@
+<h2>Approved Vacation Requests</h2>
+{% if approvedRequests is empty %}
+    <p>No vacation requests found</p>
+{% else %}
+    <table style="text-align: center;">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Team</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Comment</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in approvedRequests %}
+                <tr>
+                    <td>{{ request.employee.firstName }} {{ request.employee.lastName }}</td>
+                    <td>{{ request.employee.team.name }}</td>
+                    <td>{{ request.startDate|date('Y-m-d') }}</td>
+                    <td>{{ request.endDate|date('Y-m-d') }}</td>
+                    <td>{{ request.comment }}</td>
+                    <td>{{ request.status }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

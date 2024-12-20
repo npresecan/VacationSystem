@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\RequestRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RequestRepository::class)]
 class Request
@@ -21,9 +22,11 @@ class Request
     private ?int $numberOfDays = null;
 
     #[ORM\Column(type: "datetime")]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $startDate = null;
 
     #[ORM\Column(type: "datetime")]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $endDate = null;
 
     #[ORM\Column(length: 50)]

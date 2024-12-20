@@ -3,9 +3,34 @@
 {% block title %}New Request{% endblock %}
 
 {% block body %}
+    {% if app.flashes('error') %}
+        <div class="alert alert-danger">
+            {% for message in app.flashes('error') %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <h1>Create new Request</h1>
 
-    {{ include('request/_form.html.twig') }}
+    {{ form_start(form) }}
+        <div>
+            {{ form_label(form.startDate, 'Start date') }}
+            {{ form_widget(form.startDate) }}
+            {{ form_errors(form.startDate) }}
+        </div>
+        <div>
+            {{ form_label(form.endDate, 'End date') }}
+            {{ form_widget(form.endDate) }}
+            {{ form_errors(form.endDate) }}
+        </div>
+        <div>
+            {{ form_label(form.comment, 'Comment') }}
+            {{ form_widget(form.comment) }}
+            {{ form_errors(form.comment) }}
+        </div>
+        <button type="submit">Submit</button>
+    {{ form_end(form) }}
 
     <a href="{{ path('employees_dashboard') }}">Back to dashboard</a>
 {% endblock %}

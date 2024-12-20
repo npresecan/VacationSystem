@@ -1,0 +1,10 @@
+{% if team %}
+    <h2>Team: {{ team.name }}</h2>
+    <ul>
+        {% for member in teamMembers %}
+            <li>{{ member.role.name }}: {{ member.firstName }} {{ member.lastName }} - {{ member.job.name }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No team</p>
+{% endif %}
