@@ -14,22 +14,41 @@
     <h1>Create new Request</h1>
 
     {{ form_start(form) }}
-        <div>
-            {{ form_label(form.startDate, 'Start date') }}
+        <div class="form-group">
+            {{ form_label(form.startDate) }}
             {{ form_widget(form.startDate) }}
-            {{ form_errors(form.startDate) }}
+            {% if form.startDate.vars.errors|length > 0 %}
+                <div class="invalid-feedback">
+                    {% for error in form.startDate.vars.errors %}
+                        <p>{{ error.message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
-        <div>
-            {{ form_label(form.endDate, 'End date') }}
+
+        <div class="form-group">
+            {{ form_label(form.endDate) }}
             {{ form_widget(form.endDate) }}
-            {{ form_errors(form.endDate) }}
+            {% if form.endDate.vars.errors|length > 0 %}
+                <div class="invalid-feedback">
+                    {% for error in form.endDate.vars.errors %}
+                        <p>{{ error.message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
-        <div>
-            {{ form_label(form.comment, 'Comment') }}
+
+        <div class="form-group">
+            {{ form_label(form.comment) }}
             {{ form_widget(form.comment) }}
-            {{ form_errors(form.comment) }}
+            {% if form.comment.vars.errors|length > 0 %}
+                <div class="invalid-feedback">
+                    {% for error in form.comment.vars.errors %}
+                        <p>{{ error.message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
-        <button type="submit">Submit</button>
     {{ form_end(form) }}
 
     <a href="{{ path('employees_dashboard') }}">Back to dashboard</a>

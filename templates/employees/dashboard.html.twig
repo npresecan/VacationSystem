@@ -16,10 +16,41 @@
 
     <h4>Remaining days for vacation: {{ remainingVacationDays }}/{{vacdays}}</h4>
 
-    {% include 'employees/teamlist.html.twig' with {
-        team: team,
-        teamMembers: teamMembers
-    } %}
+    {% if team %}
+        <h2>Team: {{ team.name }}</h2>
+        <ul>
+            {% for member in teamMembers %}
+                <li>
+                    {{ member.role.name }}: {{ member.firstName }} {{ member.lastName }} - {{ member.job.name }}
+                    {% set memberRequests = approvedRequests[member.id] ?? [] %}
+                    {% if memberRequests %}
+                        <h3>On vacation</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for request in memberRequests %}
+                                    <tr>
+                                        <td>{{ request.startDate|date('Y-m-d') }}</td>
+                                        <td>{{ request.endDate|date('Y-m-d') }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No approved requests</p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No team</p>
+    {% endif %}
+
 
     <form action="{{ path('app_request_new') }}" method="GET" style="display: inline;">
         <button type="submit">New request</button>

@@ -16,28 +16,14 @@ class EmployeeRepository extends ServiceEntityRepository
         parent::__construct($registry, Employee::class);
     }
 
-    //    /**
-    //     * @return Employee[] Returns an array of Employee objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('e.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function resetPassword(Employee $employee, string $hashedPassword): void
+    {
+        $employee->setPassword($hashedPassword);
+        $employee->setResetToken(null);
+        $employee->setTokenExpiry(null);
 
-    //    public function findOneBySomeField($value): ?Employee
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($employee);
+        $entityManager->flush();
+    }
 }

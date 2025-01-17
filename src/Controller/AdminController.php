@@ -35,7 +35,7 @@ class AdminController extends AbstractController
     {
         $employees = $entityManager->getRepository(Employee::class)->findAll();
         return $this->render('admin/employees.html.twig', [
-            'employees' => $employees,ž
+            'employees' => $employees,
         ]);
     }
 

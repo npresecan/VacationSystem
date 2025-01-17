@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Service\MailerService;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
 #[Route('/admin/employees')]
 final class EmployeeController extends AbstractController
@@ -26,7 +29,7 @@ final class EmployeeController extends AbstractController
     }
 
     #[Route('/new', name: 'app_employee_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, RoleRepository $roleRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, RoleRepository $roleRepository, MailerService $mailerService): Response
     {
         $employee = new Employee();
         $role = $roleRepository->find(2); 
@@ -44,8 +47,25 @@ final class EmployeeController extends AbstractController
             $hashedPassword = $passwordHasher->hashPassword($employee, $plainPassword);
             $employee->setPassword($hashedPassword);
 
+            $resetToken = bin2hex(random_bytes(32));
+            $dateTime = new \DateTime('now', new \DateTimeZone('Europe/Zagreb'));
+            $dateTime->modify('+1 hour');
+
+            $employee->setResetToken($resetToken);
+            $employee->setTokenExpiry($dateTime);
+
             $entityManager->persist($employee);
             $entityManager->flush();
+
+            $resetUrl = $this->generateUrl('app_reset_password', ['token' => $resetToken], UrlGeneratorInterface::ABSOLUTE_URL);
+            $mailerService->sendResetPasswordEmail(
+                $employee->getEmail(),
+                'email/reset_password.html.twig',
+                [
+                    'resetUrl' => $resetUrl,
+                    'employee' => $employee,
+                ]
+            );
 
             return $this->redirectToRoute('admin_employees', [], Response::HTTP_SEE_OTHER);
         }

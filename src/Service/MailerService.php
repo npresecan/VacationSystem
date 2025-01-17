@@ -4,6 +4,7 @@ namespace App\Service;
 
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use App\Entity\Request;
 
 class MailerService
@@ -37,6 +38,18 @@ class MailerService
             ->to($employee->getEmail())
             ->subject('Vacation Request Declined')
             ->html('<p>Your vacation request from ' . $vacationRequest->getStartDate()->format('Y-m-d') . ' to ' . $vacationRequest->getEndDate()->format('Y-m-d') . ' has been declined.</p>');
+
+        $this->mailer->send($email);
+    }
+
+    public function sendResetPasswordEmail(string $to, string $template, array $context = []): void
+    {
+        $email = (new TemplatedEmail())
+            ->from('nikolapresecan11@gmail.com')
+            ->to($to)
+            ->subject('Reset password')
+            ->htmlTemplate($template)
+            ->context($context);
 
         $this->mailer->send($email);
     }

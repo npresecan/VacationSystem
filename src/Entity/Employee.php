@@ -49,6 +49,12 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(name: 'job_id', referencedColumnName: 'id', nullable: true)]
     private ?Job $job = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $resetToken = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $tokenExpiry = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -171,6 +177,28 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->job = $job;
 
+        return $this;
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(?string $resetToken): self
+    {
+        $this->resetToken = $resetToken;
+        return $this;
+    }
+
+    public function getTokenExpiry(): ?\DateTimeInterface
+    {
+        return $this->tokenExpiry;
+    }
+
+    public function setTokenExpiry(?\DateTimeInterface $tokenExpiry): self
+    {
+        $this->tokenExpiry = $tokenExpiry;
         return $this;
     }
 

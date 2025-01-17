@@ -15,6 +15,7 @@ use App\Validator\EndDateAfterStartDate;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class RequestType extends AbstractType
 {
@@ -42,6 +43,9 @@ class RequestType extends AbstractType
             ->add('comment', TextareaType::class, [
                 'label' => 'Comment',
             ])
+            ->add('submit', SubmitType::class, [
+                'label' => 'Submit'
+            ]);
         ;
 
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
@@ -52,18 +56,20 @@ class RequestType extends AbstractType
                 $startDate = $request->getStartDate();
                 $endDate = $request->getEndDate();
                 $numberOfDays = $endDate->diff($startDate)->days + 1;
-                
+                if ($endDate < $startDate) {
+                    $form->get('endDate')->addError(new FormError('End date cannot be before start date.'));
+                }
+        
                 $employee = $request->getEmployee();
-                
+
                 if ($employee && $numberOfDays > $employee->getVacationDays()) {
-                    $form->addError(new FormError('You do not have enough vacation days.'));
+                    $form->get('startDate')->addError(new FormError('You do not have enough vacation days.'));
                 } else {
                     $request->setNumberOfDays($numberOfDays);
                 }
             }
         });
-        
-    }
+    }        
 
     public function configureOptions(OptionsResolver $resolver): void
     {

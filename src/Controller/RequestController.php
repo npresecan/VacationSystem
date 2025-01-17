@@ -34,31 +34,29 @@ final class RequestController extends AbstractController
         $request = new Request(); 
         $form = $this->createForm(RequestType::class, $request);
         $form->handleRequest($httpRequest);
-
-        if ($form->isSubmitted()) {
-            if (!$form->isValid()) {
-                $this->addFlash('error', 'Form submission failed.');
-                return $this->render('request/new.html.twig', [
-                    'form' => $form->createView(),
-                ]);
-            }
-
-            
+        
+        if ($form->isSubmitted() && !$form->isValid()) {
+            $this->addFlash('error', 'Form submission failed.');
+            return $this->render('request/new.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }
+        
+        if ($form->isSubmitted() && $form->isValid()) {
             $request->setEmployee($employee);
             $request->setStatus('CREATED');
             $request->setCreatedDate(new \DateTime());
 
-            
-            $entityManager->persist($request); 
+            $entityManager->persist($request);
             $entityManager->flush();
-            
+
             $this->addFlash('success', 'Your vacation request has been submitted successfully.');
             return $this->redirectToRoute('employees_dashboard', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('request/new.html.twig', [
             'request' => $request,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
