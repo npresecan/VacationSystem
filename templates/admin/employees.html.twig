@@ -12,6 +12,13 @@
 
     <br></br>
 
+    <form method="get" action="{{ path('admin_employees') }}">
+        <input type="text" name="q" value="{{ app.request.query.get('q') }}" placeholder="Search employees" />
+        <button type="submit">Search</button>
+    </form>
+
+    {% set filteredEmployees = filter_employees(employees, app.request.query.get('q')) %}
+
     <table style="text-align: center;">
         <thead>
             <tr>
@@ -25,7 +32,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for employee in employees %}
+            {% for employee in filteredEmployees %}
                 {% if 'Admin' not in employee.role.name %}
                     <tr>
                         <td>{{ employee.firstName }}</td>
