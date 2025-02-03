@@ -15,10 +15,18 @@ use App\Validator\EndDateAfterStartDate;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Carbon\Carbon;
+use App\Repository\HolidayRepository;
 
 class RequestType extends AbstractType
 {
+    private HolidayRepository $holidayRepository;
+
+    public function __construct(HolidayRepository $holidayRepository)
+    {
+        $this->holidayRepository = $holidayRepository;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -43,25 +51,31 @@ class RequestType extends AbstractType
             ->add('comment', TextareaType::class, [
                 'label' => 'Comment',
             ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Submit'
-            ]);
         ;
 
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             $form = $event->getForm();
             $request = $form->getData();
-            
+
+            if (!$request instanceof Request) {
+                return;
+            }
+        
             if ($request->getStartDate() && $request->getEndDate()) {
-                $startDate = $request->getStartDate();
-                $endDate = $request->getEndDate();
-                $numberOfDays = $endDate->diff($startDate)->days + 1;
+                $startDate = Carbon::instance($request->getStartDate());
+                $endDate = Carbon::instance($request->getEndDate());
+                
+                $holidayDates = $this->holidayRepository->getHolidayDates();
+                
+                $numberOfDays = $startDate->diffInDaysFiltered(function (Carbon $date) use ($holidayDates) {
+                    return !$date->isWeekend() && !in_array($date->format('Y-m-d'), $holidayDates);
+                }, $endDate) + 1;
+                
                 if ($endDate < $startDate) {
                     $form->get('endDate')->addError(new FormError('End date cannot be before start date.'));
                 }
-        
+                
                 $employee = $request->getEmployee();
-
                 if ($employee && $numberOfDays > $employee->getVacationDays()) {
                     $form->get('startDate')->addError(new FormError('You do not have enough vacation days.'));
                 } else {

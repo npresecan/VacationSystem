@@ -8,6 +8,10 @@
             Project Manager Dashboard
         {% endif %}
     </h1>
+    <h4>Welcome {{ username }}</h4>
+    <div>
+        <img src="{{ profile ? asset(profile) : asset('uploads/profile_images/default.jpg') }}" alt="Profile Picture" width="100" height="100">
+    </div>
 
     <form action="{{ path('logout') }}" method="POST">
         <button type="submit" class="btn btn-danger">Log out</button>
@@ -48,11 +52,7 @@
                             </form>                            
                         </td>
                         <td>
-                            <form method="post" action="{{ path('app_approve') }}">
-                                <input type="hidden" name="id" value="{{ request.id }}">
-                                <input type="hidden" name="status" value="DECLINED">
-                                <button type="submit">Decline</button>
-                            </form>
+                            <button type="button" onclick="openDeclineModal({{ request.id }})">Decline</button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -61,4 +61,26 @@
     {% endif %}
 
     {% include 'management/approvedemp.html.twig' %}
+    
+    <div id="declineModal" style="display: none;">
+        <form id="declineForm" method="post" action="{{ path('app_approve') }}">
+            <input type="hidden" name="id" id="requestId">
+            <input type="hidden" name="status" value="DECLINED">
+            <label for="comment">Reason for Decline:</label>
+            <textarea name="comment" id="comment" required></textarea>
+            <button type="submit">Submit</button>
+            <button type="button" onclick="closeDeclineModal()">Cancel</button>
+        </form>
+    </div>
+
+    <script>
+        function openDeclineModal(requestId) {
+            document.getElementById("requestId").value = requestId;
+            document.getElementById("declineModal").style.display = "block";
+        }
+
+        function closeDeclineModal() {
+            document.getElementById("declineModal").style.display = "none";
+        }
+    </script
 {% endblock %}

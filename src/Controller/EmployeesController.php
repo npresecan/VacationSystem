@@ -8,11 +8,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Team;
 use App\Entity\Employee;
 use App\Repository\RequestRepository;
+use App\Repository\ApprovedRepository;
 
 class EmployeesController extends AbstractController
 {
     #[Route('/employees/dashboard', name: 'employees_dashboard', methods: ['GET'])]
-    public function dashboard(RequestRepository $requestRepository): Response
+    public function dashboard(RequestRepository $requestRepository, ApprovedRepository $approvedRepository): Response
     {
         $user = $this->getUser();
 
@@ -28,6 +29,8 @@ class EmployeesController extends AbstractController
 
         $requests = $requestRepository->findAllRequestsForEmployee($user);
 
+        $detailedRequests = $approvedRepository->findApprovedDetailsForRequests($requests);
+
         $approvedRequests = $requestRepository->findRequestsByEmployees($teamMembers, 'APPROVED');
 
         $groupedApprovedRequests = [];
@@ -42,12 +45,14 @@ class EmployeesController extends AbstractController
         return $this->render('employees/dashboard.html.twig', [
             'username' => $user->getUsername(),
             'roles' => $user->getRoles(),
+            'profile' => $user->getProfilePicture(),
             'remainingVacationDays' => $remainingVacationDays,
             'team' => $team,
             'teamMembers' => $teamMembers,
             'vacdays' => $vacdays,
             'requests' => $requests,
             'approvedRequests' => $groupedApprovedRequests,
+            'detailedRequests' => $detailedRequests,
         ]);
     }
 }

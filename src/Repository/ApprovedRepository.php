@@ -19,7 +19,7 @@ class ApprovedRepository extends ServiceEntityRepository
         parent::__construct($registry, Approved::class);
     }
     
-    public function processApproval(Request $request, Employee $employee, string $status, \DateTimeInterface $date, MailerService $mailerService): void
+    public function processApproval(Request $request, Employee $employee, string $status, \DateTimeInterface $date, ?string $comment, MailerService $mailerService): void
     {
         $approved = $this->getEntityManager()->getRepository(Approved::class)->findOneBy(['request' => $request]);
         if (!$approved) {
@@ -33,12 +33,18 @@ class ApprovedRepository extends ServiceEntityRepository
             $approved->setTeamLeader($employee);  
             $approved->setStatusTeamLeader($status);
             $approved->setDateApprovedTl($date);
+            if ($status === 'DECLINED') {
+                $approved->setCommentTl($comment);
+            }
         }
         
         if (in_array('ROLE_PROJECT MANAGER', $employee->getRoles())) {
             $approved->setProjectManager($employee);
             $approved->setStatusProjectManager($status);
             $approved->setDateApprovedPm($date);
+            if ($status === 'DECLINED') {
+                $approved->setCommentPm($comment);
+            }
         }
         
         if ($approved->getStatusTeamLeader() === 'APPROVED' && $approved->getStatusProjectManager() === 'APPROVED') {
@@ -65,5 +71,19 @@ class ApprovedRepository extends ServiceEntityRepository
     {
         $request->setStatus('DECLINED');
         $this->getEntityManager()->persist($request);
+    }
+
+    public function findApprovedDetailsForRequests(array $requests): array
+    {
+        $approvedDetails = [];
+        
+        foreach ($requests as $request) {
+            $approval = $this->findOneBy(['request' => $request]);
+            if ($approval) {
+                $approvedDetails[$request->getId()] = $approval;
+            }
+        }
+        
+        return $approvedDetails;
     }
 }

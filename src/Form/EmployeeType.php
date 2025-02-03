@@ -11,6 +11,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
 
 class EmployeeType extends AbstractType
 {
@@ -38,7 +40,22 @@ class EmployeeType extends AbstractType
                 'class' => Job::class,
                 'choice_label' => 'name',  
                 'placeholder' => 'Choose a job',
-            ]);
+            ])
+            ->add('profilePicture', FileType::class, [
+                'label' => 'Profile Picture (JPG, PNG file)',
+                'mapped' => false, 
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '2M',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid JPG or PNG image',
+                    ])
+                ],
+            ])
         ;
     }
 

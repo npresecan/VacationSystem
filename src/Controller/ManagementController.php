@@ -28,6 +28,7 @@ class ManagementController extends AbstractController
         return $this->render('management/dashboard.html.twig', [
             'username' => $user->getUsername(),
             'roles' => $user->getRoles(),
+            'profile' => $user->getProfilePicture(),
             'team' => $team,
             'teamMembers' => $teamMembers,
             'createdRequests' => $createdRequests,

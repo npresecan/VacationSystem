@@ -10,6 +10,10 @@
         {% endfor %}
     </p>
 
+    <div>
+        <img src="{{ profile ? asset(profile) : asset('uploads/profile_images/default.jpg') }}" alt="Profile Picture" width="100" height="100">
+    </div>
+
     <form action="{{ path('logout') }}" method="POST">
         <button type="submit" class="btn btn-danger">Logout</button>
     </form>
@@ -70,14 +74,46 @@
             </thead>
             <tbody>
                 {% for request in requests %}
-                    <tr>
+                    <tr onclick="openModal({{ request.id }})">
                         <td>{{ loop.index }}</td>
                         <td>{{ request.startDate|date('Y-m-d') }}</td>
                         <td>{{ request.endDate|date('Y-m-d') }}</td>
-                        <td>
-                            {{ request.numberOfDays}}
-                        </td>
+                        <td>{{ request.numberOfDays }}</td>
                         <td>{{ request.status }}</td>
+                    </tr>
+                    <tr id="modal-{{ request.id }}" class="modal-container" style="display: none;">
+                        <td colspan="5">
+                            <div class="modal-content">
+                                <h3>Request Details</h3>
+                                {% set approval = detailedRequests[request.id] ?? null %}
+                                {% if approval %}
+                                    <p><strong>Team Leader:</strong> 
+                                        {% if approval.teamLeader is not null %}
+                                            {{ approval.teamLeader.firstName }} {{ approval.teamLeader.lastName }}
+                                        {% else %}
+                                            Not assigned
+                                        {% endif %}
+                                    </p>
+
+                                    <p><strong>Status TL:</strong> {{ approval.statusTeamLeader }}</p>
+                                    <p><strong>Comment TL:</strong> {{ approval.commentTl ?: 'No comment' }}</p>
+
+                                    <p><strong>Project Manager:</strong> 
+                                        {% if approval.projectManager is not null %}
+                                            {{ approval.projectManager.firstName }} {{ approval.projectManager.lastName }}
+                                        {% else %}
+                                            Not assigned
+                                        {% endif %}
+                                    </p>
+
+                                    <p><strong>Status PM:</strong> {{ approval.statusProjectManager }}</p>
+                                    <p><strong>Comment PM:</strong> {{ approval.commentPm ?: 'No comment' }}</p>
+                                {% else %}
+                                    <p>No approval details available.</p>
+                                {% endif %}
+                                <button onclick="closeModal({{ request.id }})">Close</button>
+                            </div>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -85,4 +121,14 @@
     {% else %}
         <p>No requests</p>
     {% endif %}
+
+    <script>
+        function openModal(requestId) {
+            document.getElementById('modal-' + requestId).style.display = 'table-row';
+        }
+
+        function closeModal(requestId) {
+            document.getElementById('modal-' + requestId).style.display = 'none';
+        }
+    </script>
 {% endblock %}

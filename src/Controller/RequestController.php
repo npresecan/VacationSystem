@@ -35,13 +35,6 @@ final class RequestController extends AbstractController
         $form = $this->createForm(RequestType::class, $request);
         $form->handleRequest($httpRequest);
         
-        if ($form->isSubmitted() && !$form->isValid()) {
-            $this->addFlash('error', 'Form submission failed.');
-            return $this->render('request/new.html.twig', [
-                'form' => $form->createView(),
-            ]);
-        }
-        
         if ($form->isSubmitted() && $form->isValid()) {
             $request->setEmployee($employee);
             $request->setStatus('CREATED');

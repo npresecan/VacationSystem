@@ -10,7 +10,7 @@ use App\Entity\Request;
 
 class EndDateAfterStartDateValidator extends ConstraintValidator
 {
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof EndDateAfterStartDate) {
             throw new UnexpectedTypeException($constraint, EndDateAfterStartDate::class);

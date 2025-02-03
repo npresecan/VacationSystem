@@ -31,6 +31,7 @@ final class ApprovedController extends AbstractController
     {
         $vacationRequestId = $request->request->get('id');
         $status = $request->request->get('status');
+        $comment = $request->request->get('comment', null);
         
         $vacationRequest = $entityManager->getRepository(Request::class)->find($vacationRequestId);
 
@@ -40,7 +41,7 @@ final class ApprovedController extends AbstractController
         
         $employee = $this->getUser(); 
 
-        $approvedRepository->processApproval($vacationRequest, $employee, $status, new \DateTime(), $mailerService);
+        $approvedRepository->processApproval($vacationRequest, $employee, $status, new \DateTime(), $comment, $mailerService);
         
         return $this->redirectToRoute('management_dashboard');
     }

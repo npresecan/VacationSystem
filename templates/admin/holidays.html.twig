@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Holidays{% endblock %}
+
+{% block body %}
+    {% include 'admin/nav.html.twig' %}
+
+    <h1>Holidays</h1>
+    
+    <form action="{{ path('app_holiday_new') }}" method="GET" style="display: inline;">
+        <button type="submit">Add new Holiday</button>
+    </form>
+
+    <br></br>
+
+    <div>
+        {% for holiday in holidays %}
+            <div>
+                <p><strong>{{ holiday.name }}:</strong> {{ holiday.date|date('Y-m-d') }}</p>
+            </div>
+        {% else %}
+            <p>No holidays available.</p>
+        {% endfor %}
+    </div>
+
+{% endblock %}

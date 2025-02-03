@@ -47,6 +47,20 @@ final class EmployeeController extends AbstractController
             $hashedPassword = $passwordHasher->hashPassword($employee, $plainPassword);
             $employee->setPassword($hashedPassword);
 
+            $imageFile = $form->get('profilePicture')->getData();
+            if ($imageFile) {
+                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+                try {
+                    $imageFile->move(
+                        $this->getParameter('profile_pictures_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Could not upload file.');
+                }
+                $employee->setProfilePicture('uploads/profile_images/' . $newFilename);
+            }
+
             $resetToken = bin2hex(random_bytes(32));
             $dateTime = new \DateTime('now', new \DateTimeZone('Europe/Zagreb'));
             $dateTime->modify('+1 hour');

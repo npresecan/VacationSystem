@@ -37,6 +37,12 @@ class Approved
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $statusProjectManager = null;
 
+    #[ORM\Column(type: "text", nullable: true)]
+    private ?string $commentTl = null;
+
+    #[ORM\Column(type: "text", nullable: true)]
+    private ?string $commentPm = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -123,6 +129,28 @@ class Approved
     {
         $this->statusProjectManager = $statusProjectManager;
 
+        return $this;
+    }
+
+    public function getCommentTl(): ?string
+    {
+        return $this->commentTl;
+    }
+
+    public function setCommentTl(?string $commentTl): static
+    {
+        $this->commentTl = $commentTl;
+        return $this;
+    }
+
+    public function getCommentPm(): ?string
+    {
+        return $this->commentPm;
+    }
+
+    public function setCommentPm(?string $commentPm): static
+    {
+        $this->commentPm = $commentPm;
         return $this;
     }
 }
