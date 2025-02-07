@@ -1,57 +1,51 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>New Request</title>
+</head>
+<body>
 
-{% block title %}New Request{% endblock %}
+{% if form is defined and form.vars.errors|length > 0 %}
+    <div style="color: red; font-weight: bold;">
+        <p>There are errors in the form:</p>
+        {% for error in form.vars.errors %}
+            <p>{{ error.message }}</p>
+        {% endfor %}
+    </div>
+{% endif %}
 
-{% block body %}
-    {% if app.flashes('error') %}
-        <div class="alert alert-danger">
-            {% for message in app.flashes('error') %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
+<h1>Create request</h1>
 
-    <h1>Create new Request</h1>
+{{ form_start(form) }}
 
-    {{ form_start(form) }}
-        <div class="form-group">
-            {{ form_label(form.startDate) }}
-            {{ form_widget(form.startDate) }}
-            {% if form.startDate.vars.errors|length > 0 %}
-                <div class="invalid-feedback">
-                    {% for error in form.startDate.vars.errors %}
-                        <p>{{ error.message }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
+    <div>
+        {{ form_label(form.startDate) }}
+        {{ form_widget(form.startDate) }}
+        {% for error in form.startDate.vars.errors %}
+            <span>{{ error.message }}</span>
+        {% endfor %}
+    </div>
 
-        <div class="form-group">
-            {{ form_label(form.endDate) }}
-            {{ form_widget(form.endDate) }}
-            {% if form.endDate.vars.errors|length > 0 %}
-                <div class="invalid-feedback">
-                    {% for error in form.endDate.vars.errors %}
-                        <p>{{ error.message }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
+    <div>
+        {{ form_label(form.endDate) }}
+        {{ form_widget(form.endDate) }}
+        {% for error in form.endDate.vars.errors %}
+            <span>{{ error.message }}</span>
+        {% endfor %}
+    </div>
 
-        <div class="form-group">
-            {{ form_label(form.comment) }}
-            {{ form_widget(form.comment) }}
-            {% if form.comment.vars.errors|length > 0 %}
-                <div class="invalid-feedback">
-                    {% for error in form.comment.vars.errors %}
-                        <p>{{ error.message }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
+    <div>
+        {{ form_label(form.comment) }}
+        {{ form_widget(form.comment) }}
+        {% for error in form.comment.vars.errors %}
+            <span>{{ error.message }}</span>
+        {% endfor %}
+    </div>
 
-        <button type="submit">Submit request</button>
-    {{ form_end(form) }}
+{{ form_end(form) }}
 
-    <a href="{{ path('employees_dashboard') }}">Back to dashboard</a>
-{% endblock %}
+<a href="{{ path('employees_dashboard') }}">Back to dashboard</a>
+
+</body>
+</html>

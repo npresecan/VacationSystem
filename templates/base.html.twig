@@ -12,17 +12,16 @@
         {% endblock %}
     </head>
     <body>
-        {% for message in app.flashes('error') %}
-            <div class="alert alert-danger">
-                {{ message }}
-            </div>
-        {% endfor %}
-
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">
-                {{ message }}
-            </div>
-        {% endfor %}
+        {% block error_messages %}
+            {% if form is defined and form.vars.errors|length > 0 %}
+                <div>
+                    <p>There are errors in the form:</p>
+                    {% for error in form.vars.errors %}
+                        <p>{{ error.message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endblock %}
 
         {% block body %}{% endblock %}
     </body>

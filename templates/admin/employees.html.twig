@@ -66,4 +66,81 @@
             {% endfor %}
         </tbody>
     </table>
+
+
+    <h2>Export Employees</h2>
+
+    <form id="exportForm">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName">
+
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName">
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+
+        <label for="birthDate">Birth Date:</label>
+        <input type="date" id="birthDate" name="birthDate">
+
+        <label for="team">Team:</label>
+        <input type="text" id="team" name="team">
+
+        <label for="role">Role:</label>
+        <input type="text" id="role" name="role">
+
+        <label for="job">Job:</label>
+        <input type="text" id="job" name="job">
+
+        <label for="format">Export Format:</label>
+        <select id="format">
+            <option value="csv">CSV</option>
+            <option value="pdf">PDF</option>
+        </select>
+
+        <button type="button" id="exportBtn">Export</button>
+    </form>
+
+    <script>
+        document.getElementById('exportBtn').addEventListener('click', function () {
+            exportUsers();
+        });
+
+        function exportUsers() {
+            let format = document.getElementById('format').value;
+            let queryParams = new URLSearchParams();
+
+            let fields = ['firstName', 'lastName', 'email', 'username', 'birthDate', 'team', 'role', 'job'];
+            
+            fields.forEach(field => {
+                let value = document.getElementById(field).value;
+                if (value) {
+                    queryParams.append(field, value);
+                }
+            });
+
+            queryParams.append('format', format);
+            let url = `/admin/export?${queryParams.toString()}`;
+
+            fetch(url, { method: 'GET' })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error during export.');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                let a = document.createElement('a');
+                a.href = window.URL.createObjectURL(blob);
+                a.download = `export_users.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            })
+            .catch(error => alert(error.message));
+        }
+    </script>
 {% endblock %}

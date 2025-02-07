@@ -5,7 +5,6 @@ namespace App\Validator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use App\Entity\Request;
 
 class EndDateAfterStartDateValidator extends ConstraintValidator
@@ -16,15 +15,17 @@ class EndDateAfterStartDateValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, EndDateAfterStartDate::class);
         }
 
-        if ($value instanceof Request) {
-            $startDate = $value->getStartDate();
-            $endDate = $value->getEndDate();
+        if (!$value instanceof Request) {
+            return;
+        }
 
-            if ($startDate && $endDate && $endDate < $startDate) {
-                $this->context->buildViolation($constraint->message)
-                    ->atPath('endDate') 
-                    ->addViolation();
-            }
+        $startDate = $value->getStartDate();
+        $endDate = $value->getEndDate();
+
+        if ($startDate && $endDate && $endDate < $startDate) {
+            $this->context->buildViolation($constraint->message)
+                ->atPath('endDate')
+                ->addViolation();
         }
     }
 }

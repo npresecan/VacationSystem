@@ -53,4 +53,16 @@ class MailerService
 
         $this->mailer->send($email);
     }
+
+    public function sendExportEmail(string $to, string $filePath, string $format): void
+    {
+        $email = (new Email())
+            ->from('nikolapresecan11@gmail.com')
+            ->to($to)
+            ->subject('Export Employees')
+            ->text('Attachment in format: ' . strtoupper($format))
+            ->attachFromPath($filePath);
+
+        $this->mailer->send($email);
+    }
 }

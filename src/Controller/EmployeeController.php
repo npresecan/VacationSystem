@@ -105,6 +105,22 @@ final class EmployeeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('profilePicture')->getData();
+
+            if ($imageFile) {
+                $newFilename = uniqid().'.'.$imageFile->guessExtension();
+                $imageFile->move($this->getParameter('profile_pictures_directory'), $newFilename);
+
+                if ($employee->getProfilePicture()) {
+                    $oldImagePath = $this->getParameter('profile_pictures_directory').'/'.$employee->getProfilePicture();
+                    if (file_exists($oldImagePath)) {
+                        unlink($oldImagePath);
+                    }
+                }
+
+                $employee->setProfilePicture('uploads/profile_images/' . $newFilename);
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('admin_employees', [], Response::HTTP_SEE_OTHER);
